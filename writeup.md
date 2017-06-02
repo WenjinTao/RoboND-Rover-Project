@@ -28,7 +28,7 @@ The main project steps are listed as follows:
 [image1]: ./misc/rover_image.jpg
 [worldmap]: ./output/worldmap.png
 [rock_img]: ./calibration_images/example_rock1.jpg
-[stuck_issue]: ./output/stuck_issue.png
+[stuck_issue]: ./output/stuck_issue.PNG
 [segmentation]: ./output/segmentation.png
 
 ## 2. Notebook Analysis
