@@ -26,10 +26,10 @@ The main project steps are listed as follows:
 [//]: # "Image References"
 
 [image1]: ./misc/rover_image.jpg
-[worldmap]: ./output/worldmap.PNG
+[worldmap]: ./output/worldmap.png
 [rock_img]: ./calibration_images/example_rock1.jpg
-[stuck_issue]: ./output/stuck_issue.PNG
-[segmentation]: ./output/segmentation.PNG
+[stuck_issue]: ./output/stuck_issue.png
+[segmentation]: ./output/segmentation.png
 
 ## 2. Notebook Analysis
 ### 2.1 Color-based Segmentation
