@@ -150,12 +150,12 @@ def perception_step(Rover):
                                                         Rover.worldmap.shape[0], 
                                                         scale)
     rock_x_world, rock_y_world = pix_to_world(rock_x_pix, 
-                                                        rock_y_pix,
-                                                        xpos,
-                                                        ypos,
-                                                        yaw,
-                                                        Rover.worldmap.shape[0], 
-                                                        scale)
+                                                rock_y_pix,
+                                                xpos,
+                                                ypos,
+                                                yaw,
+                                                Rover.worldmap.shape[0], 
+                                                scale)
    
     # 7) Update Rover worldmap (to be displayed on right side of screen)
         # Example: Rover.worldmap[obstacle_y_world, obstacle_x_world, 0] += 1
@@ -182,6 +182,12 @@ def perception_step(Rover):
     
     Rover.nav_dists = rover_centric_pixel_distances
     Rover.nav_angles = rover_centric_angles
+    
+    angle_thresh = 5
+    Rover.front_nav_count = len(np.where(np.abs(Rover.nav_angles) < angle_thresh/180*np.pi)[0])
+    Rover.left_nav_count = len(np.where(Rover.nav_angles > angle_thresh/180*np.pi)[0])
+    Rover.right_nav_count = len(np.where(Rover.nav_angles < angle_thresh/180*np.pi)[0])
+    
     
     
     return Rover

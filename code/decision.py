@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 
 # This is where you can build a decision tree for determining throttle, brake and steer 
@@ -16,33 +17,47 @@ def decision_step(Rover):
         # Check for Rover.mode status
         if Rover.mode == 'forward':
             # Check the extent of navigable terrain
-            if len(Rover.nav_angles) >= Rover.stop_forward:  
-                
-                # If the robot is stuck somewhere (e.g. got stuck by the big stone)
-                if Rover.vel == 0 and Rover.throttle > 0: #and Rover.brake <= 0.01:
-                    #Rover.throttle = 0
-                    #Rover.brake = Rover.brake_set                    
-                    Rover.steer = -15 if Rover.steer > 0 else 15
+            if (len(Rover.nav_angles) >= Rover.stop_forward) and (np.mean(Rover.nav_dists)>=20): 
+                # now we have enough nav_angles and nav_dists to guide the robot                 
                 
                 # If mode is forward, navigable terrain looks good
                 # and velocity is below max, then throttle                    
-                elif  Rover.vel < Rover.max_vel:
+                if  Rover.vel < Rover.max_vel:
                     # Set throttle value to throttle setting
                     Rover.throttle = Rover.throttle_set
                 else: # Else coast
                     Rover.throttle = 0
                 Rover.brake = 0
-                # Set steering to average angle clipped to the range +/- 15
-                bias = np.random.rand(1)[0]*2
-                Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15+bias, 15-bias)
+                # Set steering to average angle clipped to the range +/- 15 
+                
+                if Rover.front_nav_count < 200: # it's time to make a turn             
+                    Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
+                else:
+                    Rover.steer = 0
             # If there's a lack of navigable terrain pixels then go to 'stop' mode
-            elif len(Rover.nav_angles) < Rover.stop_forward:
+            elif (len(Rover.nav_angles) < Rover.stop_forward) or (np.mean(Rover.nav_dists)<10):
                     # Set mode to "stop" and hit the brakes!
                     Rover.throttle = 0
                     # Set brake to stored brake value
                     Rover.brake = Rover.brake_set
                     Rover.steer = 0
                     Rover.mode = 'stop'
+                    
+            # If the robot is stuck somewhere (e.g. got stuck by the big stone)
+            if np.abs(Rover.vel) < 0.08 and np.abs(Rover.throttle) > 0: #and Rover.brake <= 0.01:
+                Rover.stuck_count += 1
+            else:
+                Rover.stuck_count = 0
+            if Rover.stuck_count > 60:
+                if Rover.throttle > 0:                    
+                    Rover.throttle = -1
+                    Rover.steer = -np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
+                    time.sleep(.5)
+                else:                    
+                    Rover.throttle = 1
+                    Rover.steer = -np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
+                    time.sleep(.5)
+                
 
         # If we're already in "stop" mode then make different decisions
         elif Rover.mode == 'stop':

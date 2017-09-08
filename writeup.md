@@ -34,7 +34,7 @@ The main project steps are listed as follows:
 ## 2. Notebook Analysis
 ### 2.1 Color-based Segmentation
 
-The color-based segmentation is realized by the function of `color_thresh(img, rgb_thresh=(160, 160, 160))`, the code snippet is:
+The color-based segmentation is realized by the function of `color_thresh()`, the code snippet is:
 
 ```python
 def color_thresh(img, rgb_thresh=(160, 160, 160)):
@@ -159,7 +159,7 @@ Then `process_image()` was implemented on the test data using the `moviepy` func
 
 ### 2.3 Autonomous Navigation and Mapping
 
-For the `perception_step() ` in ` perception.py` script, to improve the worldmap fidelity, the update function is modified as follows:
+For the `perception_step() ` in ` perception.py` script, to improve the worldmap fidelity, the update function is modified as follows. The maps only get updated when the robot is in a relatively stable state.
 
 ```python
 if Rover.roll < 1 or Rover.pitch < 1:
@@ -168,15 +168,11 @@ if Rover.roll < 1 or Rover.pitch < 1:
     Rover.worldmap[navigable_y_world, navigable_x_world, 2] += 1
 ```
 
-For the `decision_step()` in `decision.py`) script, to overcome the stuck issues (e.g. the rover got stuck by a stone), the following condition was added.
+![][stuck_issue]
 
-```python
-# If the robot is stuck somewhere (e.g. got stuck by the big stone)
-if Rover.vel == 0 and Rover.throttle > 0:    
-    Rover.steer = -15 if Rover.steer > 0 else 15
-```
+To overcome the stuck issues (above figure),  `Rover.stuck_count` was added to `Rover` class, which counts the consecutive frames the robot was stuck with no speed. If the `stuck_count` is larger than a threshold, which means the robot has got stuck for a while, then it will apply negative throttle to leave there.
 
-After some trial and errors, I've found that the above code can solve some of the stuck issues, but not all.
+To improve the directional stability, `Rover.front_nav_count` was added. It is the number of navigable pixels  in front of the robot. Only when it's less than a threshold, the robot makes a turn using the mean value of `Rover.nav_angles`.
 
 ### 2.4 Launching in Autonomous Mode   
 
@@ -184,8 +180,6 @@ The simulator was run at ***1024x768*** with ***good quality***. The rover can n
 
 ## 3. What's Next
 
-- One issue is that the rover still got stuck by the stone for a few times, which needs to be solved. One screenshot of this issue is shown below:
-- ![][stuck_issue]
-- Another issue is that the rover kept driving on a circular path and couldn't get out in a open area. I tried to add some bias to the steering angle to make the angle not exactly +/- 15, but it didn't help.
 - To increase the mapped area and reduce the searching time, I think the current searched/mapped area and the rover trajectory can be taken into consideration.  The idea is to make the rover not drive the same way twice.
 - The pick & return function needs to be finished.
+
