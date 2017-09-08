@@ -73,7 +73,15 @@ where the navigable terrain is selected in the RGB space, while the golden rock 
 
 ### 2.2 Image Processing Pipeline
 
-The whole image processing pipeline is implemented in the function of `process_image()`, which is listed below:
+The whole image processing pipeline is implemented in the function of `process_image()`, which follows the steps below:
+
+- Perspective transformation: transform the robot view to bird-eye view
+- Color segmentation: use color threshold in different color space to segment navigable terrain, rock and obstacle.
+- Coordinate transformation: 
+  - from image pixel to rover-centric coordinate
+  - from rover-centric coordinate to world coordinate
+- Maps updating: update the three maps (navigable, rock and obstacle).
+- Maps visualization
 
 ```python
 def process_image(img):
@@ -182,4 +190,3 @@ The simulator was run at ***1024x768*** with ***good quality***. The rover can n
 
 - To increase the mapped area and reduce the searching time, I think the current searched/mapped area and the rover trajectory can be taken into consideration.  The idea is to make the rover not drive the same way twice.
 - The pick & return function needs to be finished.
-
